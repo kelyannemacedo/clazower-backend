@@ -1,8 +1,10 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-const authRoutes = require('./routes/auth');
+import dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
+import mongoose from 'mongoose';
+import authRoutes from './routes/auth.js';
+
+dotenv.config();
 
 const app = express();
 
@@ -18,15 +20,15 @@ mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log('Conectado ao MongoDB'))
-.catch((error) => console.error('Erro ao conectar ao MongoDB:', error));
+  .then(() => console.log('✅ Conectado ao MongoDB'))
+  .catch((error) => console.error('❌ Erro ao conectar ao MongoDB:', error));
 
 // Rotas
 app.use('/api/auth', authRoutes);
 
 // Rota de teste
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ message: 'Servidor está funcionando' });
+  res.status(200).json({ message: 'Servidor está funcionando ✅' });
 });
 
 // Tratamento de erros
@@ -37,6 +39,5 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });
-

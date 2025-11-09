@@ -1,5 +1,6 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+// models/User.js
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -19,7 +20,7 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     default: function() {
-      return this.email.split('@')[0];
+      return this.email ? this.email.split('@')[0] : '';
     }
   },
   customizations: {
@@ -41,84 +42,32 @@ const userSchema = new mongoose.Schema({
     status: String,
     priority: String,
     category: String,
-    createdAt: {
-      type: Date,
-      default: Date.now
-    }
+    createdAt: { type: Date, default: Date.now }
   }],
-  categories: [{
-    name: String,
-    description: String,
-    sections: [{
-      name: String,
-      items: [{
-        id: String,
-        text: String,
-        type: String,
-        completed: Boolean,
-        link: String
-      }]
-    }]
-  }],
-  customCategories: [{
-    id: String,
-    name: String,
-    sections: [{
-      id: String,
-      name: String,
-      items: [{
-        id: String,
-        text: String,
-        type: String,
-        completed: Boolean,
-        link: String
-      }]
-    }]
-  }],
-  moods: [{
-    date: Date,
-    mood: String,
-    reason: String
-  }],
-  activities: [{
-    date: Date,
-    count: Number
-  }],
-  humor: [{
-    date: Date,
-    mood: String
-  }],
-  start: [{
-    date: Date,
-    challenge: String,
-    completed: Boolean
-  }],
+  categories: Array,
+  customCategories: Array,
+  moods: Array,
+  activities: Array,
+  humor: Array,
+  start: Array,
   resetPasswordToken: String,
   resetPasswordExpires: Date,
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
-  }
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 });
 
-// Atualizar updatedAt antes de salvar
+// Atualizar updatedAt e/ou hash da senha antes de salvar
 userSchema.pre('save', async function(next) {
   this.updatedAt = Date.now();
 
-  if (!this.isModified('password')) {
-    return next();
-  }
+  if (!this.isModified('password')) return next();
 
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     next();
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 });
 
@@ -127,4 +76,5 @@ userSchema.methods.matchPassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = mongoose.model('User', userSchema);
+const User = mongoose.models.User || mongoose.model('User', userSchema);
+export default User;
