@@ -238,4 +238,40 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
+import isSubscribed from '../middleware/isSubscribed.js';
+
+// Rota acessível apenas para usuários assinantes
+router.get('/premium-content', auth, isSubscribed, async (req, res) => {
+  res.status(200).json({
+    message: "Conteúdo premium acessado com sucesso!",
+    proTip: "Aqui você pode colocar estatísticas, ferramentas premium, etc."
+  });
+});
+
+
+router.get('/subscription/status', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+
+    const now = new Date();
+
+    const subscribed =
+      user.isSubscriber === true ||
+      user.subscriptionStatus === "active" ||
+      (user.trialEndsAt && new Date(user.trialEndsAt) > now);
+
+    res.status(200).json({
+      subscribed,
+      isSubscriber: user.isSubscriber,
+      subscriptionStatus: user.subscriptionStatus,
+      trialEndsAt: user.trialEndsAt
+    });
+  } catch (err) {
+    console.error("Erro ao obter status da assinatura:", err);
+    res.status(500).json({ message: "Erro ao obter status" });
+  }
+});
+
+
 export default router;
+

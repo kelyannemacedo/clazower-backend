@@ -17,6 +17,23 @@ const userSchema = new mongoose.Schema({
     minlength: 6,
     select: false
   },
+
+  isSubscriber: {
+    type: Boolean,
+    default: false,
+  },
+  
+  subscriptionId: {
+    type: String,
+    default: null,
+  },
+  
+  role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
+  },
+  
   name: {
     type: String,
     default: function() {
@@ -78,3 +95,7 @@ userSchema.methods.matchPassword = async function(enteredPassword) {
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 export default User;
+// models/User.js
+import mongoose from 'mongoose';
+
+
