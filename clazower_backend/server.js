@@ -1,15 +1,15 @@
-import dotenv from 'dotenv';
-import express from 'express';
-import cors from 'cors';
-import mongoose from 'mongoose';
-import authRoutes from './routes/auth.js';
+import dotenv from "dotenv";
+import express from "express";
+import cors from "cors";
+import mongoose from "mongoose";
+import authRoutes from "./routes/auth.js";
 
 dotenv.config();
 
 const app = express();
 
 /* -----------------------------
-   ⚠️  STRIPE WEBHOOK (DEVE VIR ANTES DO JSON)
+   ⚠️  STRIPE WEBHOOK – ANTES DO JSON
 -------------------------------- */
 import stripeWebhook from "./routes/stripeWebhook.js";
 app.use("/stripe", express.raw({ type: "application/json" }));
@@ -21,32 +21,39 @@ app.use("/stripe", stripeWebhook);
 app.use(express.json());
 
 /* -----------------------------
-   CORS
+   CORS OFICIAL – ÚNICO BLOCO
 -------------------------------- */
-app.use(cors({
-  origin: [
-    "https://clazower.web.app",
-    "http://localhost:5173"
-  ],
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "https://clazower.web.app",
+      "https://clazower.firebaseapp.com",
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 /* -----------------------------
    MONGO
 -------------------------------- */
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-  .then(() => console.log('✅ Conectado ao MongoDB'))
-  .catch((error) => console.error('❌ Erro ao conectar ao MongoDB:', error));
+mongoose
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("✅ Conectado ao MongoDB"))
+  .catch((error) =>
+    console.error("❌ Erro ao conectar ao MongoDB:", error)
+  );
 
 /* -----------------------------
-   ROTAS NORMAIS DO API
+   ROTAS DO API
 -------------------------------- */
-app.use('/api/auth', authRoutes);
+app.use("/api/auth", authRoutes);
 
 import paymentsRoutes from "./routes/payments.js";
 app.use("/payments", paymentsRoutes);
@@ -54,8 +61,8 @@ app.use("/payments", paymentsRoutes);
 /* -----------------------------
    HEALTH CHECK
 -------------------------------- */
-app.get('/api/health', (req, res) => {
-  res.status(200).json({ message: 'Servidor está funcionando ✅' });
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ message: "Servidor funcionando 🚀" });
 });
 
 /* -----------------------------
@@ -63,11 +70,11 @@ app.get('/api/health', (req, res) => {
 -------------------------------- */
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ message: 'Erro interno do servidor' });
+  res.status(500).json({ message: "Erro interno do servidor" });
 });
 
 /* -----------------------------
-   START SERVER — Última linha
+   START SERVER
 -------------------------------- */
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
