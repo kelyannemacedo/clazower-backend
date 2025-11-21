@@ -9,14 +9,7 @@ dotenv.config();
 const app = express();
 
 /* -----------------------------
-   ⚠️  STRIPE WEBHOOK – ANTES DO JSON
--------------------------------- */
-import stripeWebhook from "./routes/stripeWebhook.js";
-app.use("/stripe", express.raw({ type: "application/json" }));
-app.use("/stripe", stripeWebhook);
-
-/* -----------------------------
-   JSON NORMAL DO EXPRESS
+   JSON DO EXPRESS (primeiro agora)
 -------------------------------- */
 app.use(express.json());
 
@@ -51,12 +44,9 @@ mongoose
   );
 
 /* -----------------------------
-   ROTAS DO API
+   ROTAS DA API
 -------------------------------- */
 app.use("/api/auth", authRoutes);
-
-import paymentsRoutes from "./routes/payments.js";
-app.use("/payments", paymentsRoutes);
 
 /* -----------------------------
    HEALTH CHECK
