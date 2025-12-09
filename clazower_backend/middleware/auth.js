@@ -2,10 +2,15 @@ import jwt from 'jsonwebtoken';
 
 const auth = (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
+    let token = req.headers.authorization;
 
     if (!token) {
       return res.status(401).json({ message: 'Token não fornecido' });
+    }
+
+    // Se vier "Bearer token", remove o Bearer
+    if (token.startsWith("Bearer ")) {
+      token = token.split(" ")[1];
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
