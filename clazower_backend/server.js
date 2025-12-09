@@ -3,18 +3,19 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import authRoutes from "./routes/auth.js";
+import dataRoutes from "./routes/data.js";  // <--- ADICIONADO
 
 dotenv.config();
 
 const app = express();
 
 /* -----------------------------
-   JSON DO EXPRESS (primeiro agora)
+   JSON DO EXPRESS
 -------------------------------- */
 app.use(express.json());
 
 /* -----------------------------
-   CORS OFICIAL – ÚNICO BLOCO
+   CORS
 -------------------------------- */
 app.use(
   cors({
@@ -47,6 +48,7 @@ mongoose
    ROTAS DA API
 -------------------------------- */
 app.use("/api/auth", authRoutes);
+app.use("/api/data", dataRoutes);  // <--- ADICIONADO
 
 /* -----------------------------
    HEALTH CHECK
