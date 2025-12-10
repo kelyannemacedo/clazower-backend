@@ -7,6 +7,11 @@ const dataRoutes = require('./routes/data');
 
 const app = express();
 
+// ADICIONE ESTES DOIS MIDDLEWARES
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
 // Middleware
 const allowedOrigins = ['https://clazower.web.app', 'http://localhost:5173'];
 
