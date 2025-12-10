@@ -1,8 +1,7 @@
-import express from 'express';
-import jwt from 'jsonwebtoken';
-import User from '../models/User.js';
-import auth from '../middleware/auth.js';
-
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+const auth = require('../middleware/auth');
 const router = express.Router();
 
 // Registrar novo usuário
@@ -124,45 +123,31 @@ router.get('/me', auth, async (req, res) => {
   }
 });
 
-// Atualizar dados do usuário
+// Atualizar dados do usuário (Apenas customizações e campos não relacionados a dados do app)
 router.put('/me', auth, async (req, res) => {
   try {
-    const { customizations, projects, categories, customCategories, moods, activities, humor, start } = req.body;
+    const { customizations } = req.body;
 
     const user = await User.findByIdAndUpdate(
       req.userId,
       {
         customizations: customizations || undefined,
-        projects: projects || undefined,
-        categories: categories || undefined,
-        customCategories: customCategories || undefined,
-        moods: moods || undefined,
-        activities: activities || undefined,
-        humor: humor || undefined,
-        start: start || undefined
       },
       { new: true }
     );
 
     res.status(200).json({
-      message: 'Dados atualizados com sucesso',
+      message: 'Dados de customização atualizados com sucesso',
       user: {
         id: user._id,
         email: user.email,
         name: user.name,
         customizations: user.customizations,
-        projects: user.projects,
-        categories: user.categories,
-        customCategories: user.customCategories,
-        moods: user.moods,
-        activities: user.activities,
-        humor: user.humor,
-        start: user.start
       }
     });
   } catch (error) {
-    console.error('Erro ao atualizar dados:', error);
-    res.status(500).json({ message: 'Erro ao atualizar dados' });
+    console.error('Erro ao atualizar dados de customização:', error);
+    res.status(500).json({ message: 'Erro ao atualizar dados de customização' });
   }
 });
 
@@ -238,6 +223,10 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
+router.get('/test', (req, res) => {
+  res.json({ message: 'Auth funcionando!' });
+});
 
-export default router;
+
+module.exports = router;
 
