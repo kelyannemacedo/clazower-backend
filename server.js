@@ -8,11 +8,20 @@ const dataRoutes = require('./routes/data');
 const app = express();
 
 // Middleware
-app.use(express.json());
+const allowedOrigins = ['https://clazower.web.app', 'http://localhost:5173'];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: function(origin, callback){
+    if(!origin) return callback(null, true); // para requests como Postman ou curl
+    if(allowedOrigins.indexOf(origin) === -1){
+      const msg = 'O CORS não permite essa origem';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   credentials: true
 }));
+
 
 // Conexão com MongoDB
 async function connectDB() {
