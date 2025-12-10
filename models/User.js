@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema({
   saude: Array,
   trabalho: Array,
   treino: Array,
-  projects: [{
+  projetos: [{ // <--- CORRIGIDO
     id: String,
     name: String,
     description: String,
@@ -99,7 +99,7 @@ const userSchema = new mongoose.Schema({
     date: Date,
     mood: String
   }],
-  start: [{
+  start_challenges: [{ // <--- CORRIGIDO
     date: Date,
     challenge: String,
     completed: Boolean
