@@ -15,12 +15,17 @@ app.use(cors({
 }));
 
 // Conexão com MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('Conectado ao MongoDB'))
-.catch((error) => console.error('Erro ao conectar ao MongoDB:', error));
+async function connectDB() {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('Conectado ao MongoDB');
+  } catch (error) {
+    console.error('Erro ao conectar ao MongoDB:', error);
+  }
+}
+
+connectDB();
+
 
 // Rotas
 app.use('/api/auth', authRoutes);
