@@ -3,7 +3,6 @@ const auth = require('../middleware/auth');
 const User = require('../models/User');
 const router = express.Router();
 
-// Rota para carregar todos os dados do usuário
 // GET /api/data/load
 router.get('/load', auth, async (req, res) => {
     try {
@@ -13,7 +12,6 @@ router.get('/load', auth, async (req, res) => {
             return res.status(404).json({ message: 'Usuário não encontrado' });
         }
 
-        // Retorna todos os campos de dados que o frontend espera
         const appData = {
             agenda: user.agenda,
             compras: user.compras,
@@ -23,15 +21,14 @@ router.get('/load', auth, async (req, res) => {
             livre1: user.livre1,
             livre2: user.livre2,
             panorama: user.panorama,
-            projetos: user.projects, // Mapeamento de projects para projetos
+            projetos: user.projetos,               // <-- CORRIGIDO
             saude: user.saude,
-            start_challenges: user.start, // Mapeamento de start para start_challenges
+            start_challenges: user.start_challenges, // <-- CORRIGIDO
             trabalho: user.trabalho,
             treino: user.treino,
             moods: user.moods,
             activities: user.activities,
             humor: user.humor,
-            // Adicione outros campos conforme o Schema do User
         };
 
         res.status(200).json(appData);
@@ -41,13 +38,11 @@ router.get('/load', auth, async (req, res) => {
     }
 });
 
-// Rota para salvar todos os dados do usuário
 // POST /api/data/save
 router.post('/save', auth, async (req, res) => {
     try {
         const data = req.body;
 
-        // Mapeamento dos campos do frontend para o Schema do Mongoose
         const updateFields = {
             agenda: data.agenda,
             compras: data.compras,
@@ -57,19 +52,18 @@ router.post('/save', auth, async (req, res) => {
             livre1: data.livre1,
             livre2: data.livre2,
             panorama: data.panorama,
-            projects: data.projetos, // Mapeamento de projetos para projects
+            projetos: data.projetos,                // <-- CORRIGIDO
             saude: data.saude,
-            start: data.start_challenges, // Mapeamento de start_challenges para start
+            start_challenges: data.start_challenges, // <-- CORRIGIDO
             trabalho: data.trabalho,
             treino: data.treino,
             moods: data.moods,
             activities: data.activities,
             humor: data.humor,
-            // Adicione outros campos conforme o Schema do User
         };
 
-        // Remove campos undefined para não sobrescrever com valor nulo
-        Object.keys(updateFields).forEach(key => updateFields[key] === undefined && delete updateFields[key]);
+        Object.keys(updateFields)
+            .forEach(key => updateFields[key] === undefined && delete updateFields[key]);
 
         const user = await User.findByIdAndUpdate(
             req.userId,

@@ -102,19 +102,20 @@ router.post('/login', async (req, res) => {
 router.get('/me', auth, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
+
     res.status(200).json({
       user: {
         id: user._id,
         email: user.email,
         name: user.name,
         customizations: user.customizations,
-        projects: user.projects,
+        projetos: user.projetos,                 // <-- corrigido
         categories: user.categories,
         customCategories: user.customCategories,
         moods: user.moods,
         activities: user.activities,
         humor: user.humor,
-        start: user.start
+        start_challenges: user.start_challenges  // <-- corrigido
       }
     });
   } catch (error) {
@@ -123,7 +124,7 @@ router.get('/me', auth, async (req, res) => {
   }
 });
 
-// Atualizar dados do usuário (Apenas customizações e campos não relacionados a dados do app)
+// Atualizar dados de customização
 router.put('/me', auth, async (req, res) => {
   try {
     const { customizations } = req.body;
@@ -227,6 +228,4 @@ router.get('/test', (req, res) => {
   res.json({ message: 'Auth funcionando!' });
 });
 
-
 module.exports = router;
-
