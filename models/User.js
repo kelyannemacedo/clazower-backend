@@ -36,9 +36,27 @@ const userSchema = new mongoose.Schema({
   },
 
   // =============================
-  // CATEGORIAS PADRÃO (TODAS DEVEM SER ARRAYS)
+  // AGENDA (CORRIGIDO)
   // =============================
-  agenda: { type: Array, default: [] },
+  agenda: {
+    type: Object,
+    default: {
+      todoDia: [],
+      fixa: [],
+      remoto: [],
+      segunda: [],
+      terca: [],
+      quarta: [],
+      quinta: [],
+      sexta: [],
+      sabado: [],
+      domingo: []
+    }
+  },
+
+  // =============================
+  // OUTRAS CATEGORIAS PADRÃO
+  // =============================
   compras: { type: Array, default: [] },
   documentos: { type: Array, default: [] },
   estudos: { type: Array, default: [] },
@@ -51,7 +69,7 @@ const userSchema = new mongoose.Schema({
   treino: { type: Array, default: [] },
 
   // =============================
-  // PROJETOS (PADRONIZADO COMO "clazowerProjects")
+  // PROJETOS
   // =============================
   clazowerProjects: {
     type: [
@@ -69,7 +87,7 @@ const userSchema = new mongoose.Schema({
   },
 
   // =============================
-  // CATEGORIAS E SUBCATEGORIAS PERSONALIZADAS
+  // CATEGORIAS PERSONALIZADAS
   // =============================
   categories: {
     type: [
@@ -121,7 +139,7 @@ const userSchema = new mongoose.Schema({
   },
 
   // =============================
-  // HUMOR, ATIVIDADES, DESAFIOS
+  // HUMOR E ATIVIDADES
   // =============================
   moods: {
     type: [
@@ -165,9 +183,6 @@ const userSchema = new mongoose.Schema({
     default: []
   },
 
-  // =============================
-  // RESET DE SENHA
-  // =============================
   resetPasswordToken: String,
   resetPasswordExpires: Date,
 
@@ -182,16 +197,11 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-// =============================
-// MIDDLEWARE PARA ATUALIZAR "updatedAt"
-// E ENCRIPTAR SENHA
-// =============================
+// Middleware para updatedAt + senha
 userSchema.pre('save', async function (next) {
   this.updatedAt = Date.now();
 
-  if (!this.isModified('password')) {
-    return next();
-  }
+  if (!this.isModified('password')) return next();
 
   try {
     const salt = await bcrypt.genSalt(10);
@@ -202,9 +212,7 @@ userSchema.pre('save', async function (next) {
   }
 });
 
-// =============================
-// MÉTODO PARA COMPARAR SENHAS
-// =============================
+// Comparar senha
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
