@@ -127,15 +127,28 @@ router.get('/me', auth, async (req, res) => {
 // Atualizar dados de customização
 router.put('/me', auth, async (req, res) => {
   try {
+    const allowedFields = [
+      'customizations',
+      'moods',
+      'activities',
+      'humor',
+      'start_challenges',
+      'categories',
+      'customCategories',
+      'clazowerProjects'
+    ]
+
     const update = {}
 
-    // 🔒 protege contra payload errado
-    if (req.body.customizations && typeof req.body.customizations === 'object') {
-      update.customizations = req.body.customizations
+    // 🔒 só permite campos conhecidos
+    for (const key of allowedFields) {
+      if (req.body[key] !== undefined) {
+        update[key] = req.body[key]
+      }
     }
 
     if (Object.keys(update).length === 0) {
-      return res.status(400).json({ message: 'Nada para atualizar' })
+      return res.status(400).json({ message: 'Nenhum campo válido para atualizar' })
     }
 
     const user = await User.findByIdAndUpdate(
@@ -150,11 +163,12 @@ router.put('/me', auth, async (req, res) => {
         id: user._id,
         email: user.email,
         name: user.name,
-        customizations: user.customizations
+        customizations: user.customizations,
+        moods: user.moods
       }
     })
   } catch (error) {
-    console.error('Erro ao atualizar /auth/me:', error)
+    console.error('🔥 ERRO REAL /auth/me:', error)
     res.status(500).json({ message: 'Erro ao atualizar usuário' })
   }
 })
