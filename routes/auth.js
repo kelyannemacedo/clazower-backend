@@ -127,30 +127,38 @@ router.get('/me', auth, async (req, res) => {
 // Atualizar dados de customização
 router.put('/me', auth, async (req, res) => {
   try {
-    const { customizations } = req.body;
+    const update = {}
+
+    // 🔒 protege contra payload errado
+    if (req.body.customizations && typeof req.body.customizations === 'object') {
+      update.customizations = req.body.customizations
+    }
+
+    if (Object.keys(update).length === 0) {
+      return res.status(400).json({ message: 'Nada para atualizar' })
+    }
 
     const user = await User.findByIdAndUpdate(
       req.userId,
-      {
-        customizations: customizations || undefined,
-      },
-      { new: true }
-    );
+      { $set: update },
+      { new: true, runValidators: true }
+    )
 
     res.status(200).json({
-      message: 'Dados de customização atualizados com sucesso',
+      message: 'Usuário atualizado com sucesso',
       user: {
         id: user._id,
         email: user.email,
         name: user.name,
-        customizations: user.customizations,
+        customizations: user.customizations
       }
-    });
+    })
   } catch (error) {
-    console.error('Erro ao atualizar dados de customização:', error);
-    res.status(500).json({ message: 'Erro ao atualizar dados de customização' });
+    console.error('Erro ao atualizar /auth/me:', error)
+    res.status(500).json({ message: 'Erro ao atualizar usuário' })
   }
-});
+})
+
 
 // Recuperar senha
 router.post('/forgot-password', async (req, res) => {

@@ -141,16 +141,29 @@ const userSchema = new mongoose.Schema({
   // =============================
   // HUMOR E ATIVIDADES
   // =============================
-  moods: {
-    type: [
-      {
-        date: Date,
-        mood: String,
-        reason: String
+ // =============================
+// HUMOR
+// =============================
+
+moods: {
+  type: [
+    {
+      mood: {
+        type: String,
+        required: true
+      },
+      reason: {
+        type: String,
+        default: ''
+      },
+      date: {
+        type: Date,
+        default: Date.now
       }
-    ],
-    default: []
-  },
+    }
+  ],
+  default: []
+},
 
   activities: {
     type: [
