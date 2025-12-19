@@ -1,33 +1,21 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend')
 
-const sendResetPasswordEmail = async (email, token) => {
-  const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+const resend = new Resend(process.env.RESEND_API_KEY)
 
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    secure: false, // Gmail usa STARTTLS
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS
-    }
-  });
+async function sendResetPasswordEmail(email, token) {
+  const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`
 
-  await transporter.sendMail({
-    from: `"Clazower" <${process.env.SMTP_USER}>`,
+  return resend.emails.send({
+    from: process.env.FROM_EMAIL,
     to: email,
-    subject: 'Redefinição de senha',
+    subject: 'Redefinição de senha - Clazower',
     html: `
       <h2>Redefinição de senha</h2>
       <p>Clique no link abaixo para redefinir sua senha:</p>
-      <p>
-        <a href="${resetLink}">Redefinir senha</a>
-      </p>
+      <a href="${resetLink}">Redefinir senha</a>
       <p>Este link expira em 1 hora.</p>
-      <br />
-      <p>Se você não solicitou essa redefinição, ignore este e-mail.</p>
     `
-  });
-};
+  })
+}
 
-module.exports = { sendResetPasswordEmail };
+module.exports = { sendResetPasswordEmail }
