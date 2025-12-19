@@ -8,7 +8,10 @@ const userSchema = new mongoose.Schema({
     unique: true,
     lowercase: true,
     trim: true,
-    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Por favor, forneça um e-mail válido']
+    match: [
+      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+      'Por favor, forneça um e-mail válido'
+    ]
   },
 
   password: {
@@ -25,6 +28,10 @@ const userSchema = new mongoose.Schema({
     }
   },
 
+  // 🔐 RESET DE SENHA (APENAS UMA VEZ)
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
+
   // =============================
   // CUSTOMIZAÇÕES
   // =============================
@@ -36,7 +43,7 @@ const userSchema = new mongoose.Schema({
   },
 
   // =============================
-  // AGENDA (CORRIGIDO)
+  // AGENDA
   // =============================
   agenda: {
     type: Object,
@@ -55,7 +62,7 @@ const userSchema = new mongoose.Schema({
   },
 
   // =============================
-  // OUTRAS CATEGORIAS PADRÃO
+  // OUTRAS CATEGORIAS
   // =============================
   compras: { type: Array, default: [] },
   documentos: { type: Array, default: [] },
@@ -141,29 +148,16 @@ const userSchema = new mongoose.Schema({
   // =============================
   // HUMOR E ATIVIDADES
   // =============================
- // =============================
-// HUMOR
-// =============================
-
-moods: {
-  type: [
-    {
-      mood: {
-        type: String,
-        required: true
-      },
-      reason: {
-        type: String,
-        default: ''
-      },
-      date: {
-        type: Date,
-        default: Date.now
+  moods: {
+    type: [
+      {
+        mood: { type: String, required: true },
+        reason: { type: String, default: '' },
+        date: { type: Date, default: Date.now }
       }
-    }
-  ],
-  default: []
-},
+    ],
+    default: []
+  },
 
   activities: {
     type: [
@@ -196,9 +190,6 @@ moods: {
     default: []
   },
 
-  resetPasswordToken: String,
-  resetPasswordExpires: Date,
-
   createdAt: {
     type: Date,
     default: Date.now
@@ -210,7 +201,9 @@ moods: {
   }
 });
 
-// Middleware para updatedAt + senha
+// =============================
+// MIDDLEWARE
+// =============================
 userSchema.pre('save', async function (next) {
   this.updatedAt = Date.now();
 
@@ -225,7 +218,9 @@ userSchema.pre('save', async function (next) {
   }
 });
 
-// Comparar senha
+// =============================
+// MÉTODO DE SENHA
+// =============================
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

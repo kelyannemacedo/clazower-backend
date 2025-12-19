@@ -3,6 +3,9 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
 const router = express.Router();
+const { forgotPassword } = require('../controllers/authController');
+const { sendResetPasswordEmail } = require('../services/emailService');
+
 
 // Registrar novo usuário
 router.post('/register', async (req, res) => {
@@ -174,37 +177,73 @@ router.put('/me', auth, async (req, res) => {
 })
 
 
-// Recuperar senha
-router.post('/forgot-password', async (req, res) => {
+// Resetar senha com token na URL
+router.post('/reset-password/:token', async (req, res) => {
   try {
-    const { email } = req.body;
+    const { token } = req.params;
+    const { newPassword, confirmPassword } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ message: 'Por favor, forneça um e-mail' });
+    if (!newPassword || !confirmPassword) {
+      return res.status(400).json({
+        message: 'Por favor, preencha todos os campos'
+      });
     }
 
-    const user = await User.findOne({ email: email.toLowerCase() });
-    if (!user) {
-      return res.status(404).json({ message: 'Usuário não encontrado' });
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        message: 'As senhas não coincidem'
+      });
     }
 
-    const resetToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '1h'
-    });
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        message: 'A senha deve ter pelo menos 6 caracteres'
+      });
+    }
 
-    user.resetPasswordToken = resetToken;
-    user.resetPasswordExpires = new Date(Date.now() + 3600000);
+    // 🔐 valida o token
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      return res.status(400).json({
+        message: 'Token inválido ou expirado'
+      });
+    }
+
+    const user = await User.findById(decoded.id);
+
+    if (!user || user.resetPasswordToken !== token) {
+      return res.status(400).json({
+        message: 'Token inválido ou expirado'
+      });
+    }
+
+    if (user.resetPasswordExpires < Date.now()) {
+      return res.status(400).json({
+        message: 'Token expirado'
+      });
+    }
+
+    // 🔑 atualiza senha
+    user.password = newPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
     await user.save();
 
-    res.status(200).json({
-      message: 'E-mail de recuperação enviado',
-      resetToken: resetToken
+    return res.json({
+      message: 'Senha redefinida com sucesso'
     });
+
   } catch (error) {
-    console.error('Erro ao recuperar senha:', error);
-    res.status(500).json({ message: 'Erro ao recuperar senha' });
+    console.error('Erro ao redefinir senha:', error);
+    return res.status(500).json({
+      message: 'Erro interno'
+    });
   }
 });
+
+
 
 // Resetar senha
 router.post('/reset-password', async (req, res) => {
