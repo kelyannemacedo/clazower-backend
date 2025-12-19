@@ -2,10 +2,9 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
-const router = express.Router();
-const { forgotPassword } = require('../controllers/authController');
 const { sendResetPasswordEmail } = require('../services/emailService');
 
+const router = express.Router();
 
 // Registrar novo usuário
 router.post('/register', async (req, res) => {
