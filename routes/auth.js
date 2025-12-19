@@ -175,6 +175,54 @@ router.put('/me', auth, async (req, res) => {
   }
 })
 
+// ==============================
+// 🔐 ESQUECI A SENHA
+// ==============================
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body
+
+    if (!email) {
+      return res.status(400).json({
+        message: 'Por favor, forneça um e-mail'
+      })
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase() })
+
+    // 🔒 segurança: não revela se o e-mail existe
+    if (!user) {
+      return res.status(200).json({
+        message: 'Se o e-mail existir, um link será enviado'
+      })
+    }
+
+    const resetToken = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    )
+
+    user.resetPasswordToken = resetToken
+    user.resetPasswordExpires = Date.now() + 3600000 // 1h
+    await user.save()
+
+    // 📧 ENVIA O EMAIL
+    await sendResetPasswordEmail(user.email, resetToken)
+
+    return res.status(200).json({
+      message: 'E-mail de redefinição enviado'
+    })
+
+  } catch (error) {
+    console.error('Erro no forgot-password:', error)
+    return res.status(500).json({
+      message: 'Erro interno'
+    })
+  }
+})
+
+
 
 // Resetar senha com token na URL
 router.post('/reset-password/:token', async (req, res) => {
