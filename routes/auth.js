@@ -291,49 +291,4 @@ router.post('/reset-password/:token', async (req, res) => {
 });
 
 
-
-// Resetar senha
-router.post('/reset-password', async (req, res) => {
-  try {
-    const { resetToken, newPassword, confirmPassword } = req.body;
-
-    if (!resetToken || !newPassword || !confirmPassword) {
-      return res.status(400).json({ message: 'Por favor, preencha todos os campos' });
-    }
-
-    if (newPassword !== confirmPassword) {
-      return res.status(400).json({ message: 'As senhas não coincidem' });
-    }
-
-    if (newPassword.length < 6) {
-      return res.status(400).json({ message: 'A senha deve ter pelo menos 6 caracteres' });
-    }
-
-    const decoded = jwt.verify(resetToken, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
-
-    if (!user || user.resetPasswordToken !== resetToken) {
-      return res.status(400).json({ message: 'Token inválido ou expirado' });
-    }
-
-    if (user.resetPasswordExpires < new Date()) {
-      return res.status(400).json({ message: 'Token expirado' });
-    }
-
-    user.password = newPassword;
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpires = undefined;
-    await user.save();
-
-    res.status(200).json({ message: 'Senha redefinida com sucesso' });
-  } catch (error) {
-    console.error('Erro ao resetar senha:', error);
-    res.status(500).json({ message: 'Erro ao resetar senha' });
-  }
-});
-
-router.get('/test', (req, res) => {
-  res.json({ message: 'Auth funcionando!' });
-});
-
 module.exports = router;
