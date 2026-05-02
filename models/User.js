@@ -74,6 +74,17 @@ const userSchema = new mongoose.Schema({
   saude: { type: Array, default: [] },
   trabalho: { type: Array, default: [] },
   treino: { type: Array, default: [] },
+  mural: {
+    type: [
+      {
+        id: Number,
+        text: String,
+        type: String, // check | number | link | title
+        checked: Boolean
+      }
+    ],
+    default: []
+  },
 
   // =============================
   // PROJETOS
