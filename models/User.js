@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+console.log("🔥 MURAL ATIVO NO BACKEND")
 
 const userSchema = new mongoose.Schema({
   email: {
