@@ -78,15 +78,21 @@ const userSchema = new mongoose.Schema({
   mural: {
     type: [
       {
-        id: Number,
-        text: String,
-        type: String, // check | number | link | title
-        checked: Boolean
+        id: String, // UUID da seção
+        name: String,
+        items: [
+          {
+            id: String,
+            text: String,
+            type: String, // checkbox | numbered | link | title
+            completed: Boolean,
+            link: String
+          }
+        ]
       }
     ],
     default: []
-  },
-
+  }
   // =============================
   // PROJETOS
   // =============================
