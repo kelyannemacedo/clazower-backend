@@ -78,21 +78,56 @@ const userSchema = new mongoose.Schema({
   mural: {
     type: [
       {
-        id: String, // UUID da seção
-        name: String,
-        items: [
-          {
-            id: String,
-            text: String,
-            type: String, // checkbox | numbered | link | title
-            completed: Boolean,
-            link: String
-          }
-        ]
+        id: {
+          type: String,
+          default: () => require('crypto').randomUUID()
+        },
+  
+        name: {
+          type: String,
+          trim: true,
+          maxlength: 30,
+          default: 'Nova Seção'
+        },
+  
+        items: {
+          type: [
+            {
+              id: {
+                type: String,
+                default: () => require('crypto').randomUUID()
+              },
+  
+              text: {
+                type: String,
+                default: '',
+                trim: true
+              },
+  
+              type: {
+                type: String,
+                enum: ['checkbox', 'numbered', 'link', 'title'],
+                default: 'checkbox'
+              },
+  
+              completed: {
+                type: Boolean,
+                default: false
+              },
+  
+              link: {
+                type: String,
+                default: ''
+              }
+            }
+          ],
+          default: []
+        }
       }
     ],
     default: []
-  }
+  },
+    
   // =============================
   // PROJETOS
   // =============================
