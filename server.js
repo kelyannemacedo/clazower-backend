@@ -10,11 +10,13 @@ const app = express();
 /* =============================
    🔵 1. CORS CORRIGIDO (Render + Firebase)
    ============================= */
-const allowedOrigins = [
-  'https://clazower.web.app',
-  'http://localhost:5173',
-  'https://clazower-backend.onrender.com'
-];
+  const allowedOrigins = [
+    'https://clazower.web.app',
+    'http://localhost:5173',
+    'https://clazower-backend.onrender.com',
+    'https://localhost',
+    'capacitor://localhost'
+  ];
 
 // CORS seguro, porém sem quebrar quando a origem for "undefined" (como no Render)
 app.use(
